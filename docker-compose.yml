@@ -4,35 +4,36 @@ web:
   expose:
     - "8000"
   links:
-    - postgres:postgres
+    - mongodb
   volumes:
-    - /usr/src/app/static
+    - ./web:/web
   env_file: .env
-  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
+  command: python -u app.py
+#  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
 
-nginx:
+#nginx:
+#  restart: always
+#  build: ./nginx/
+#  ports:
+#    - "80:80"
+#  volumes:
+#    - /www/static
+#  volumes_from:
+#    - web
+#  links:
+#    - web:web
+#
+#data:
+#  restart: always
+#  image: postgres:latest
+#  volumes:
+#    - /var/lib/postgresql
+#  command: true
+
+mongodb:
   restart: always
-  build: ./nginx/
+  image: mongo:3.2.10
+#  volumes_from:
+#    - data
   ports:
-    - "80:80"
-  volumes:
-    - /www/static
-  volumes_from:
-    - web
-  links:
-    - web:web
-
-data:
-  restart: always
-  image: postgres:latest
-  volumes:
-    - /var/lib/postgresql
-  command: true
-
-postgres:
-  restart: always
-  image: postgres:latest
-  volumes_from:
-    - data
-  ports:
-    - "5432:5432"
+    - "7070:27017"
