@@ -10,7 +10,8 @@ services:
     volumes:
       - ./web:/web
 #    env_file: .env
-    command: python -u app.py
+#    command: python -u app.py
+    command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
 
   data:
     restart: always
@@ -26,18 +27,14 @@ services:
     volumes_from:
       - data
 
-#  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
-
-#nginx:
-#  restart: always
-#  build: ./nginx/
-#  ports:
-#    - "80:80"
-#  volumes:
-#    - /www/static
-#  volumes_from:
-#    - web
-#  links:
-#    - web:web
-#
-
+  nginx:
+    restart: always
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - /www/static
+    volumes_from:
+      - web
+    links:
+      - web:web
