@@ -1,14 +1,31 @@
-web:
-  restart: always
-  build: ./web
-  expose:
-    - "8000"
-  links:
-    - mongodb
-  volumes:
-    - ./web:/web
-  env_file: .env
-  command: python -u app.py
+version: '2'
+services:
+  web:
+    restart: always
+    build: ./web
+    ports:
+      - "8000:8000"
+    links:
+      - mongodb
+    volumes:
+      - ./web:/web
+#    env_file: .env
+    command: python -u app.py
+
+  data:
+    restart: always
+    image: mongo:3.2.10
+    volumes:
+      - /var/data
+
+  mongodb:
+    restart: always
+    image: mongo:3.2.10
+    ports:
+      - "27017:27017"
+    volumes_from:
+      - data
+
 #  command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
 
 #nginx:
@@ -23,17 +40,4 @@ web:
 #  links:
 #    - web:web
 #
-#data:
-#  restart: always
-#  image: postgres:latest
-#  volumes:
-#    - /var/lib/postgresql
-#  command: true
 
-mongodb:
-  restart: always
-  image: mongo:3.2.10
-#  volumes_from:
-#    - data
-  ports:
-    - "7070:27017"

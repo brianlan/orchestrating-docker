@@ -1,7 +1,7 @@
 from mongoengine import *
 
 
-connect(host='localhost', port=27017, name='orchestrating_docker')
+connect('orchestrating_docker', host='mongodb', port=27017)
 
 
 class Post(Document):
