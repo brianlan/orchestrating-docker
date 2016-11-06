@@ -2,22 +2,34 @@ version: '2'
 services:
   web:
     restart: always
-    build: ./web
+    build:
+       context: ./web
     ports:
       - "8000:8000"
     links:
-      - mongodb
+      - mongodb:mongodb
+      - rabbitmq:rabbit
+      - redis:redis
     volumes:
       - ./web:/web
-#    env_file: .env
-#    command: python -u app.py
     command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
 
-  data:
+  post_writer:
     restart: always
+    build:
+       context: ./post_writer
+    links:
+      - mongodb:mongodb
+      - rabbitmq:rabbit
+      - redis:redis
+    volumes:
+      - ./post_writer:/post_writer
+    command: celery -A post_writer worker --loglevel=info
+
+  data:
     image: mongo:3.2.10
     volumes:
-      - /var/data
+      - /var/data/mongodb
 
   mongodb:
     restart: always
@@ -38,3 +50,13 @@ services:
       - web
     links:
       - web:web
+
+  rabbitmq:
+    image: rabbitmq:3.6.5
+    ports:
+      - "5672:5672"
+
+  redis:
+    image: redis:3.2.5
+    ports:
+      - "6379:6379"

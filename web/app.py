@@ -3,6 +3,8 @@ import datetime
 from flask import Flask
 from flask import request, render_template
 
+from post_writer import insert_post
+
 from models import Post
 
 
@@ -13,8 +15,9 @@ app = Flask(__name__)
 def index():
     if request.method == 'POST':
         text = request.form['text']
-        post = Post(text=text, date_posted=datetime.datetime.now())
-        post.save()
+        insert_post.delay(text)
+        # post = Post(text=text, date_posted=datetime.datetime.now())
+        # post.save()
 
     posts = Post.objects()
     return render_template('index.html', posts=posts)
