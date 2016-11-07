@@ -12,6 +12,8 @@ services:
       - redis:redis
     volumes:
       - ./web:/web
+    logging:
+      driver: fluentd
     command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
 
   post_writer:
@@ -24,6 +26,8 @@ services:
       - redis:redis
     volumes:
       - ./post_writer:/post_writer
+    logging:
+      driver: fluentd
     command: celery -A post_writer worker --loglevel=info
 
   nginx:
@@ -35,6 +39,8 @@ services:
       - /www/static
     volumes_from:
       - web
+    logging:
+      driver: fluentd
     links:
       - web:web
 
@@ -43,19 +49,35 @@ services:
     image: mongo:3.2.10
     ports:
       - "27017:27017"
+    logging:
+      driver: fluentd
     volumes:
       - data:/var/data/mongodb
 
   rabbitmq:
     image: rabbitmq:3.6.5
+    logging:
+      driver: fluentd
     ports:
       - "5672:5672"
 
   redis:
     image: redis:3.2.5
+    logging:
+      driver: fluentd
     ports:
       - "6379:6379"
 
+  fluentd:
+    image: fluent/fluentd
+    volumes:
+      - log_data:/fluentd/log
+    ports:
+      - "24224:24224"
+
 volumes:
   data:
+    driver: local
+
+  log_data:
     driver: local
