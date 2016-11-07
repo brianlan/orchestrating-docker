@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from flask import Flask
 from flask import request, render_template
@@ -21,6 +22,12 @@ def index():
 
     posts = Post.objects()
     return render_template('index.html', posts=posts)
+
+
+@app.route('/posts', methods=['GET'])
+def get_posts():
+    posts = Post.objects()
+    return posts.to_json()
 
 
 if __name__ == '__main__':
