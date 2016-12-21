@@ -1,5 +1,5 @@
-import time
 import asyncio
+import aiohttp
 import signal
 import sys
 
